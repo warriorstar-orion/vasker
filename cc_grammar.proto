@@ -1,0 +1,372 @@
+// WSO-Vasker: Golang C++ AST Parser Tools
+// Copyright (c) 2021 Warriorstar Orion <orion@snowfrost.garden>
+// SPDX-License-Identifier: MIT
+syntax = "proto2";
+
+package cc_transformer;
+
+option go_package = "snowfrost.garden/vasker/cc_grammar";
+
+message Project {
+  optional string prefix = 1;
+  repeated DeclarationFile declaration_files = 3;
+  repeated DefinitionFile definition_files = 2;
+}
+
+message FileMetadata {
+  optional string filename = 1;
+  optional uint32 file_id = 2;
+  optional string source_path = 3;
+}
+
+message Preamble {
+  repeated string headers = 1;
+}
+
+message DefinitionFile {
+  optional FileMetadata file_metadata = 1;
+  optional Preamble preamble = 2;
+  optional string base_include = 3;
+  repeated NamespacedDefinition namespaced_definitions = 4;
+}
+
+enum AccessSpecifier {
+  PRIVATE = 0;
+  PUBLIC = 1;
+  PROTECTED = 2;
+}
+
+message BaseSpecifier {
+  optional AccessSpecifier access_specifier = 1;
+  optional Identifier class_or_decltype = 2;
+}
+
+message Constructor {}
+message Destructor {
+  optional Identifier class_name = 1;
+  optional BlockDefinition block_definition = 2;
+}
+message CopyAssignmentOperator {}
+message MoveAssignmentOperator {}
+
+message UsingDeclaration {
+  optional Identifier identifier = 1;
+}
+
+message MemberDeclarator {
+  optional Initializer initializer = 1;
+  oneof Value {
+    Identifier declared_name = 2;
+  }
+  optional bool friend = 4;
+}
+
+message MemberDeclaratorList {
+  repeated MemberDeclarator member_declarators = 1;
+}
+
+message MemberSpecification {
+  oneof Value {
+    MemberDeclaratorList member_declarators = 1;
+
+    Constructor constructor = 2;
+    Destructor destructor = 3;
+    CopyAssignmentOperator copy_assignment_operator = 4;
+    MoveAssignmentOperator move_assignment_operator = 5;
+    FunctionDeclaration function_declaration = 6;
+    FunctionDefinition function_definition = 7;
+    
+    AccessSpecifier access_specifier = 8;
+    UsingDeclaration using_declaration = 9;
+    
+    // static_assert declarations
+    // member template declarations
+    // alias declarations
+    // deduction guides
+  }
+}
+
+message ClassDeclaration {
+  optional string name = 1;
+  repeated BaseSpecifier base_specifiers = 2;
+  repeated MemberSpecification member_specifiers = 3;
+}
+
+message ClassDefinition {
+  optional string name = 1;
+  repeated FunctionDefinition function_definitions = 2;
+}
+
+message NamespacedDeclaration {
+  optional string namespace = 1;
+  repeated ClassForwardDeclaration class_forward_declarations = 2;
+  repeated ClassDeclaration class_declarations = 3;
+  repeated FunctionDeclaration function_declarations = 4;
+}
+
+message NamespacedDefinition {
+  optional string namespace = 1;
+  repeated ClassDefinition class_definitions = 2;
+  repeated FunctionDefinition function_definitions = 3;
+}
+
+message DeclarationFile {
+  optional FileMetadata file_metadata = 1;
+  optional Preamble preamble = 2;
+  optional string include_guard = 3;
+  repeated NamespacedDeclaration namespaced_declarations = 4;
+}
+
+message ClassForwardDeclaration {
+  optional string namespace = 1;
+  optional string class_name = 2;
+}
+
+message NamespaceDeclaration {
+  optional string declaration = 1;
+}
+
+message IfStatement {
+  optional Expression condition = 1;
+  optional Statement statement_true = 2;
+  optional Statement statement_false = 3;
+}
+
+message CompoundStatement {
+  repeated Statement statements = 1;
+}
+
+message SimpleTypeSpecifier {
+  oneof Value {
+    Identifier declared_name = 1;
+  }
+}
+
+message TypeSpecifier {
+  oneof Value {
+    SimpleTypeSpecifier simple_type_specifier = 1;
+  }
+}
+
+message DeclarationSpecifier {
+  oneof Value {
+    // type-specifier-seq
+    TypeSpecifier type_specifier = 1;
+  }
+}
+
+message Declarator {
+  optional Initializer initializer = 1;
+  oneof Value {
+    // unqualified-id or qualified-id
+    Identifier declared_name = 2;
+  }
+}
+
+message CopyInitializer {
+  optional Expression other = 1;
+}
+
+message Initializer {
+  oneof Value {
+    CopyInitializer copy_initializer = 1;
+  }
+}
+
+message SimpleDeclaration {
+  // attr since C++11
+
+  // decl-specific-seq
+  repeated DeclarationSpecifier specifiers = 1;
+  // init-declarator-list
+  repeated Declarator declarators = 2;
+}
+
+message BlockDeclaration {
+  oneof Value {
+    SimpleDeclaration simple_declaration = 1;
+  }
+}
+
+message Declaration {
+  oneof value {
+    BlockDeclaration block_declaration = 1;
+  }
+}
+
+message Statement {
+  oneof value {
+    Expression expression_statement = 1;
+    CompoundStatement compound_statement = 2;
+    IfStatement if_statement = 3;
+    Declaration declaration_statement = 4;
+  }
+}
+
+message Expression {
+  oneof value {
+    AssignmentExpression assignment_expression = 1;
+    UnaryExpression unary_expression = 2;
+    ArithmeticExpression arithmetic_expression = 3;
+    LogicalExpression logical_expression = 4;
+    ComparisonExpression comparison_expression = 5;
+    MemberAccessExpression member_access_expression = 6;
+    FunctionCallExpression function_call_expression = 7;
+    Literal literal_expression = 8;
+    Identifier identifier_expression = 9;
+  }
+}
+
+message InitializerList {
+  repeated Expression args = 1;
+}
+
+message FunctionCallExpression {
+  optional Expression name = 1;
+  repeated ExpressionArg arguments = 2;
+  message ExpressionArg {
+    oneof Value {
+      Expression expression = 1;
+      InitializerList initializer_list = 2;
+    }
+  }
+}
+
+message Identifier {
+  optional string namespace = 1;
+  optional string id = 2;
+}
+
+message BlockDefinition {
+  repeated Statement statements = 1;
+}
+
+message FunctionDefinition {
+  optional FunctionDeclaration declaration = 1;
+  optional BlockDefinition block_definition = 2;
+}
+
+message FunctionDeclaration {
+  optional string name = 1;
+  optional CppType return_type = 2;
+  repeated FunctionArgument arguments = 3;
+}
+
+message CppType {
+  enum PType {
+    UNKNOWN = 0;
+    NONE = 1;
+    RAW_POINTER = 2;
+    REFERENCE = 3;
+    UNIQUE_PTR = 4;
+    SHARED_PTR = 5;
+  }
+  optional PType p_type = 1;
+  optional string name = 2;
+}
+
+message FunctionArgument {
+  optional CppType cpp_type = 1;
+  optional string name = 2;
+}
+
+message AssignmentExpression {
+  enum Operator {
+    SIMPLE = 0;
+    ADDITION = 1;
+    SUBTRACTION = 2;
+    MULTIPLICATION = 3;
+    DIVISION = 4;
+    MODULO = 5;
+    BITWISE_AND = 6;
+    BITWISE_OR = 7;
+    BITWISE_XOR = 8;
+    BITWISE_LSHIFT = 9;
+    BITWISE_RSHIFT = 10;
+  }
+  optional Operator operator = 1;
+  optional Expression lhs = 2;
+  optional Expression rhs = 3;
+}
+
+message UnaryExpression {
+  enum Operator {
+    UNARY_PLUS = 1;
+    UNARY_MINUS = 2;
+    BITWISE_NOT = 3;
+    PRE_INCREMENT = 4;
+    PRE_DECREMENT = 5;
+    POST_INCREMENT = 6;
+    POST_DECREMENT = 7;
+    LOGICAL_NOT = 8;
+    POINTER_INDIRECTION = 9;
+    ADDRESS_OF = 10;
+  }
+  optional Operator operator = 1;
+  optional Expression operand = 2;
+}
+
+message LogicalExpression {
+  enum Operator {
+    LOGICAL_AND = 1;
+    LOGICAL_OR = 2;
+  }
+  optional Operator operator = 1;
+  optional Expression lhs = 2;
+  optional Expression rhs = 3;
+}
+
+message ComparisonExpression {
+  enum Operator {
+    EQUAL_TO = 1;
+    NOT_EQUAL_TO = 2;
+    LESS_THAN = 3;
+    GREATER_THAN = 4;
+    LESS_THAN_OR_EQUAL_TO = 5;
+    GREATER_THAN_OR_EQUAL_TO = 6;
+  }
+  optional Operator operator = 1;
+  optional Expression lhs = 2;
+  optional Expression rhs = 3;
+}
+
+message MemberAccessExpression {
+  enum Operator {
+    SUBSCRIPT = 1;
+    MEMBER_OF_OBJECT = 2;
+    MEMBER_OF_POINTER = 3;
+    POINTER_TO_OBJECT_MEMBER = 4;
+    POINTER_TO_POINTER_MEMBER = 5;
+  }
+  optional Operator operator = 1;
+  optional Expression lhs = 2;
+  optional Expression rhs = 3;
+}
+
+message ArithmeticExpression {
+  enum Operator {
+    ADDITION = 1;
+    SUBTRACTION = 2;
+    MULTIPLICATION = 3;
+    DIVISION = 4;
+    MODULO = 5;
+    BITWISE_AND = 6;
+    BITWISE_OR = 7;
+    BITWISE_XOR = 8;
+    BITWISE_LSHIFT = 9;
+    BITWISE_RSHIFT = 10;
+  }
+  optional Operator operator = 1;
+  optional Expression lhs = 2;
+  optional Expression rhs = 3;
+}
+
+message Literal {
+  oneof Value {
+    int64 integer_literal = 1;
+    int64 character_literal = 2;
+    float float_literal = 3;
+    string string_literal = 4;
+    bool boolean_literal = 5; 
+  }
+}

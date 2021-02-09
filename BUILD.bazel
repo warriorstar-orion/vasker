@@ -1,0 +1,18 @@
+# WSO-Vasker: Golang C++ AST Parser Tools
+# Copyright (c) 2021 Warriorstar Orion <orion@snowfrost.garden>
+# SPDX-License-Identifier: MIT
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+
+package(default_visibility = ["//visibility:public"])
+
+proto_library(
+    name = "cc_grammar_proto",
+    srcs = ["cc_grammar.proto"],
+)
+
+go_proto_library(
+    name = "cc_grammar_go_proto",
+    importpath = "snowfrost.garden/vasker/cc_grammar",
+    protos = [":cc_grammar_proto"],
+)
