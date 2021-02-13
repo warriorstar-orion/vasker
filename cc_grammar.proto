@@ -30,6 +30,11 @@ message DefinitionFile {
   repeated NamespacedDefinition namespaced_definitions = 4;
 }
 
+message Identifier {
+  optional string namespace = 1;
+  optional string id = 2;
+}
+
 enum AccessSpecifier {
   PRIVATE = 0;
   PUBLIC = 1;
@@ -39,9 +44,21 @@ enum AccessSpecifier {
 message BaseSpecifier {
   optional AccessSpecifier access_specifier = 1;
   optional Identifier class_or_decltype = 2;
+  optional bool virtual = 3;
 }
 
-message Constructor {}
+message MemberInitializer {
+  optional Identifier member = 1;
+  repeated Expression expressions = 2;
+}
+
+message Constructor {
+  optional Identifier class_name = 1;
+  repeated FunctionArgument arguments = 2;
+  repeated MemberInitializer member_initializers = 3;
+  optional BlockDefinition block_definition = 4;
+}
+
 message Destructor {
   optional Identifier class_name = 1;
   optional BlockDefinition block_definition = 2;
@@ -58,16 +75,14 @@ message MemberDeclarator {
   oneof Value {
     Identifier declared_name = 2;
   }
-  optional bool friend = 4;
-}
-
-message MemberDeclaratorList {
-  repeated MemberDeclarator member_declarators = 1;
+  optional CppType declared_type = 3;
+  optional bool class = 4;
+  optional bool friend = 5;
 }
 
 message MemberSpecification {
   oneof Value {
-    MemberDeclaratorList member_declarators = 1;
+    MemberDeclarator member_declarator = 1;
 
     Constructor constructor = 2;
     Destructor destructor = 3;
@@ -108,6 +123,7 @@ message NamespacedDefinition {
   optional string namespace = 1;
   repeated ClassDefinition class_definitions = 2;
   repeated FunctionDefinition function_definitions = 3;
+  repeated Constructor constructors = 4;
 }
 
 message DeclarationFile {
@@ -148,11 +164,22 @@ message TypeSpecifier {
   }
 }
 
+message FunctionSpecifier {
+  enum FunctionSpecifierKeyword {
+    INLINE = 1;
+    VIRTUAL = 2;
+    EXPLICIT = 3;
+  }
+  optional FunctionSpecifierKeyword keyword = 1;
+}
+
 message DeclarationSpecifier {
   oneof Value {
+    FunctionSpecifier function_specifier = 1;
     // type-specifier-seq
-    TypeSpecifier type_specifier = 1;
+    TypeSpecifier type_specifier = 2;
   }
+  optional bool virtual = 3;
 }
 
 message Declarator {
@@ -232,11 +259,6 @@ message FunctionCallExpression {
   }
 }
 
-message Identifier {
-  optional string namespace = 1;
-  optional string id = 2;
-}
-
 message BlockDefinition {
   repeated Statement statements = 1;
 }
@@ -246,10 +268,22 @@ message FunctionDefinition {
   optional BlockDefinition block_definition = 2;
 }
 
+message VirtSpecifier {
+  enum Keyword {
+    OVERRIDE = 1;
+    FINAL = 2;
+    OVERRIDE_FINAL = 3;
+    FINAL_OVERRIDE = 4;
+  }
+  optional Keyword keyword = 1;
+}
+
 message FunctionDeclaration {
   optional string name = 1;
   optional CppType return_type = 2;
   repeated FunctionArgument arguments = 3;
+  optional VirtSpecifier virt_specifier = 4;
+  optional Identifier member_of = 5;
 }
 
 message CppType {
