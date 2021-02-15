@@ -221,12 +221,19 @@ message Declaration {
   }
 }
 
+message DoWhile {
+  optional Expression condition = 1;
+  optional BlockDefinition block_definition = 2;
+}
+
 message Statement {
   oneof value {
     Expression expression_statement = 1;
     CompoundStatement compound_statement = 2;
     IfStatement if_statement = 3;
     Declaration declaration_statement = 4;
+    DoWhile do_while = 5;
+    RangeBasedFor range_based_for = 6;
   }
 }
 
@@ -403,4 +410,10 @@ message Literal {
     string string_literal = 4;
     bool boolean_literal = 5; 
   }
+}
+
+message RangeBasedFor {
+  optional Declaration declaration = 1;
+  optional Expression range_expression = 2;
+  optional BlockDefinition loop_definition = 3;
 }
