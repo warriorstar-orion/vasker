@@ -2,6 +2,7 @@
 # Copyright (c) 2021 Warriorstar Orion <orion@snowfrost.garden>
 # SPDX-License-Identifier: MIT
 load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,4 +16,17 @@ go_proto_library(
     name = "cc_grammar_go_proto",
     importpath = "snowfrost.garden/vasker/cc_grammar",
     protos = [":cc_grammar_proto"],
+)
+
+go_library(
+    name = "vasker",
+    srcs = [
+        "declarations.go",
+        "expressions.go",
+    ],
+    importpath = "snowfrost.garden/vasker",
+    deps = [
+        "@com_github_golang_protobuf//proto:go_default_library",
+        ":cc_grammar_go_proto",
+    ],
 )
