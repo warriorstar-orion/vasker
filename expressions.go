@@ -1,8 +1,8 @@
 package vasker
 
 import (
-	cctpb "snowfrost.garden/vasker/cc_grammar"
 	"github.com/golang/protobuf/proto"
+	cctpb "snowfrost.garden/vasker/cc_grammar"
 )
 
 func StringLiteralExpr(s string) *cctpb.Expression {
@@ -44,10 +44,10 @@ func Id(id string) *cctpb.Identifier {
 	}
 }
 
-func NsId(ns string, id string) *cctpb.Identifier{
+func NsId(ns string, id string) *cctpb.Identifier {
 	return &cctpb.Identifier{
 		Namespace: proto.String(ns),
-		Id: proto.String(id),
+		Id:        proto.String(id),
 	}
 }
 
@@ -55,13 +55,13 @@ func NsId(ns string, id string) *cctpb.Identifier{
 // expression.
 func PtrIndirect(expr *cctpb.Expression) *cctpb.Expression {
 	return &cctpb.Expression{
-						Value: &cctpb.Expression_UnaryExpression{
-							&cctpb.UnaryExpression{
-								Operator: cctpb.UnaryExpression_POINTER_INDIRECTION.Enum(),
-								Operand: expr,
-							},
-						},
-					}
+		Value: &cctpb.Expression_UnaryExpression{
+			&cctpb.UnaryExpression{
+				Operator: cctpb.UnaryExpression_POINTER_INDIRECTION.Enum(),
+				Operand:  expr,
+			},
+		},
+	}
 
 }
 
@@ -71,8 +71,8 @@ func ObjMember(obj *cctpb.Expression, member *cctpb.Expression) *cctpb.Expressio
 		Value: &cctpb.Expression_MemberAccessExpression{
 			&cctpb.MemberAccessExpression{
 				Operator: cctpb.MemberAccessExpression_MEMBER_OF_OBJECT.Enum(),
-				Lhs: obj,
-				Rhs: member,
+				Lhs:      obj,
+				Rhs:      member,
 			},
 		},
 	}
@@ -84,8 +84,8 @@ func PtrMember(obj *cctpb.Expression, member *cctpb.Expression) *cctpb.Expressio
 		Value: &cctpb.Expression_MemberAccessExpression{
 			&cctpb.MemberAccessExpression{
 				Operator: cctpb.MemberAccessExpression_MEMBER_OF_POINTER.Enum(),
-				Lhs: obj,
-				Rhs: member,
+				Lhs:      obj,
+				Rhs:      member,
 			},
 		},
 	}
@@ -111,4 +111,14 @@ func wrapFuncCallExpr(e *cctpb.Expression) *cctpb.FunctionCallExpression_Express
 // AddFuncArg adds the expression e to the arguments of the function call fce.
 func AddFuncArg(fce *cctpb.FunctionCallExpression, e *cctpb.Expression) {
 	fce.Arguments = append(fce.Arguments, wrapFuncCallExpr(e))
+}
+
+func AddFuncInitListArg(fce *cctpb.FunctionCallExpression, exprs ...*cctpb.Expression) {
+	iList := &cctpb.InitializerList{}
+	for _, expr := range exprs {
+		iList.Args = append(iList.Args, expr)
+	}
+	fce.Arguments = append(fce.Arguments, &cctpb.FunctionCallExpression_ExpressionArg{
+		Value: &cctpb.FunctionCallExpression_ExpressionArg_InitializerList{iList},
+	})
 }

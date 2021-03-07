@@ -26,7 +26,7 @@ go_library(
     ],
     importpath = "snowfrost.garden/vasker",
     deps = [
-        "@com_github_golang_protobuf//proto:go_default_library",
         ":cc_grammar_go_proto",
+        "@com_github_golang_protobuf//proto:go_default_library",
     ],
 )

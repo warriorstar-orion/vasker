@@ -1,8 +1,8 @@
 package vasker
 
 import (
-	cctpb "snowfrost.garden/vasker/cc_grammar"
 	"github.com/golang/protobuf/proto"
+	cctpb "snowfrost.garden/vasker/cc_grammar"
 )
 
 func VarDecl(name string, ident *cctpb.Identifier) *cctpb.Declaration {

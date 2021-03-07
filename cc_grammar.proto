@@ -6,6 +6,8 @@ syntax = "proto2";
 package cc_transformer;
 
 option go_package = "snowfrost.garden/vasker/cc_grammar";
+option java_package = "garden.snowfrost.vasker";
+option java_outer_classname = "Cc";
 
 message Project {
   optional string prefix = 1;
@@ -19,9 +21,7 @@ message FileMetadata {
   optional string source_path = 3;
 }
 
-message Preamble {
-  repeated string headers = 1;
-}
+message Preamble { repeated string headers = 1; }
 
 message DefinitionFile {
   optional FileMetadata file_metadata = 1;
@@ -66,15 +66,11 @@ message Destructor {
 message CopyAssignmentOperator {}
 message MoveAssignmentOperator {}
 
-message UsingDeclaration {
-  optional Identifier identifier = 1;
-}
+message UsingDeclaration { optional Identifier identifier = 1; }
 
 message MemberDeclarator {
   optional Initializer initializer = 1;
-  oneof Value {
-    Identifier declared_name = 2;
-  }
+  oneof Value { Identifier declared_name = 2; }
   optional CppType declared_type = 3;
   optional bool class = 4;
   optional bool friend = 5;
@@ -90,10 +86,10 @@ message MemberSpecification {
     MoveAssignmentOperator move_assignment_operator = 5;
     FunctionDeclaration function_declaration = 6;
     FunctionDefinition function_definition = 7;
-    
+
     AccessSpecifier access_specifier = 8;
     UsingDeclaration using_declaration = 9;
-    
+
     // static_assert declarations
     // member template declarations
     // alias declarations
@@ -138,9 +134,7 @@ message ClassForwardDeclaration {
   optional string class_name = 2;
 }
 
-message NamespaceDeclaration {
-  optional string declaration = 1;
-}
+message NamespaceDeclaration { optional string declaration = 1; }
 
 message IfStatement {
   optional Expression condition = 1;
@@ -148,20 +142,14 @@ message IfStatement {
   optional Statement statement_false = 3;
 }
 
-message CompoundStatement {
-  repeated Statement statements = 1;
-}
+message CompoundStatement { repeated Statement statements = 1; }
 
 message SimpleTypeSpecifier {
-  oneof Value {
-    Identifier declared_name = 1;
-  }
+  oneof Value { Identifier declared_name = 1; }
 }
 
 message TypeSpecifier {
-  oneof Value {
-    SimpleTypeSpecifier simple_type_specifier = 1;
-  }
+  oneof Value { SimpleTypeSpecifier simple_type_specifier = 1; }
 }
 
 message FunctionSpecifier {
@@ -190,14 +178,10 @@ message Declarator {
   }
 }
 
-message CopyInitializer {
-  optional Expression other = 1;
-}
+message CopyInitializer { optional Expression other = 1; }
 
 message Initializer {
-  oneof Value {
-    CopyInitializer copy_initializer = 1;
-  }
+  oneof Value { CopyInitializer copy_initializer = 1; }
 }
 
 message SimpleDeclaration {
@@ -210,21 +194,26 @@ message SimpleDeclaration {
 }
 
 message BlockDeclaration {
-  oneof Value {
-    SimpleDeclaration simple_declaration = 1;
-  }
+  oneof Value { SimpleDeclaration simple_declaration = 1; }
 }
 
 message Declaration {
-  oneof value {
-    BlockDeclaration block_declaration = 1;
-  }
+  oneof value { BlockDeclaration block_declaration = 1; }
 }
 
 message DoWhile {
   optional Expression condition = 1;
   optional BlockDefinition block_definition = 2;
 }
+
+message While {
+  optional Expression condition = 1;
+  optional BlockDefinition block_definition = 2;
+}
+
+message CoYield { optional Expression expr = 1; }
+
+message CoReturn { optional Expression expr = 1; }
 
 message Statement {
   oneof value {
@@ -236,6 +225,9 @@ message Statement {
     RangeBasedFor range_based_for = 6;
     ForLoop for_loop = 7;
     ReturnStatement return_statement = 8;
+    While while = 9;
+    CoYield co_yield = 10;
+    CoReturn co_return = 11;
   }
 }
 
@@ -265,9 +257,7 @@ message ForLoop {
   optional Statement body = 4;
 }
 
-message InitializerList {
-  repeated Expression args = 1;
-}
+message InitializerList { repeated Expression args = 1; }
 
 message FunctionCallExpression {
   optional Expression name = 1;
@@ -280,9 +270,7 @@ message FunctionCallExpression {
   }
 }
 
-message BlockDefinition {
-  repeated Statement statements = 1;
-}
+message BlockDefinition { repeated Statement statements = 1; }
 
 message FunctionDefinition {
   optional FunctionDeclaration declaration = 1;
@@ -422,7 +410,7 @@ message Literal {
     int64 character_literal = 2;
     float float_literal = 3;
     string string_literal = 4;
-    bool boolean_literal = 5; 
+    bool boolean_literal = 5;
   }
 }
 
