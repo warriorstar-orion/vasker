@@ -26,6 +26,16 @@ func IntLiteralExpr(i int32) *cctpb.Expression {
 	}
 }
 
+func Bool(b bool) *cctpb.Expression {
+	return &cctpb.Expression{
+		Value: &cctpb.Expression_LiteralExpression{
+			&cctpb.Literal{
+				Value: &cctpb.Literal_BooleanLiteral{b},
+			},
+		},
+	}
+}
+
 func IdExpr(id *cctpb.Identifier) *cctpb.Expression {
 	return &cctpb.Expression{
 		Value: &cctpb.Expression_IdentifierExpression{id},

@@ -211,9 +211,9 @@ message While {
   optional BlockDefinition block_definition = 2;
 }
 
-message CoYield { optional Expression expr = 1; }
+message CoYield { optional Expression expression = 1; }
 
-message CoReturn { optional Expression expr = 1; }
+message CoReturn { optional Expression expression = 1; }
 
 message Statement {
   oneof value {
@@ -226,8 +226,7 @@ message Statement {
     ForLoop for_loop = 7;
     ReturnStatement return_statement = 8;
     While while = 9;
-    CoYield co_yield = 10;
-    CoReturn co_return = 11;
+    CoReturn co_return = 10;
   }
 }
 
@@ -242,7 +241,33 @@ message Expression {
     FunctionCallExpression function_call_expression = 7;
     Literal literal_expression = 8;
     Identifier identifier_expression = 9;
+    LambdaExpression lambda_expression = 10;
+    CoYield co_yield = 11;
   }
+}
+
+message LambdaCapture {
+  enum LambdaCaptureType {
+    UNKNOWN = 1;
+    SIMPLE = 2;
+  }
+  optional Identifier identifier = 1;
+  optional Initializer initializer = 2;
+  optional LambdaCaptureType capture_type = 3;
+}
+
+message LambdaExpression {
+  enum LambdaCaptureDefault {
+    UNKNOWN = 1;
+    NONE = 2;
+    BY_REFERENCE = 3;
+    BY_COPY = 4;
+  }
+  optional LambdaCaptureDefault capture_default = 1;
+  repeated LambdaCapture capture = 2;
+  repeated FunctionArgument arguments = 3;
+  optional CppType trailing_return_type = 4;
+  optional BlockDefinition body = 5;
 }
 
 message ForLoop {
