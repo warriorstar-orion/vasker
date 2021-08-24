@@ -132,3 +132,15 @@ func AddFuncInitListArg(fce *cctpb.FunctionCallExpression, exprs ...*cctpb.Expre
 		Value: &cctpb.FunctionCallExpression_ExpressionArg_InitializerList{iList},
 	})
 }
+
+// Returns the expression "first == second"
+func EqualityCheck(first *cctpb.Expression, second *cctpb.Expression) *cctpb.Expression {
+	ce := &cctpb.ComparisonExpression{
+		Operator: cctpb.ComparisonExpression_EQUAL_TO.Enum(),
+		Lhs: first,
+		Rhs: second,
+	}
+	return &cctpb.Expression{
+		Value: &cctpb.Expression_ComparisonExpression{ce},
+	}
+}

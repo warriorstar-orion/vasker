@@ -230,6 +230,13 @@ message Statement {
   }
 }
 
+message ConditionalOperator {
+  optional Expression predicate = 1;
+  optional Expression first = 2;
+  optional Expression second = 3;
+}
+
+
 message Expression {
   oneof value {
     AssignmentExpression assignment_expression = 1;
@@ -243,6 +250,7 @@ message Expression {
     Identifier identifier_expression = 9;
     LambdaExpression lambda_expression = 10;
     CoYield co_yield = 11;
+    ConditionalOperator conditional_operator = 12;
   }
 }
 
@@ -272,14 +280,19 @@ message LambdaExpression {
 
 message ForLoop {
   oneof init {
-    SimpleDeclaration simple_declaration = 1;
+    Statement init_statement = 1;
     Expression init_expression = 2;
   }
   oneof condition {
     Expression cond_expression = 3;
     // TODO: Declaration with brace-or-equals identifier
   }
-  optional Statement body = 4;
+  // iteration-expression is not a statement according
+  // to the grammar, but permitting a statement allows
+  // a tiny amount of wiggle room when transforming ASTs
+  // in other languages which may allow a statement.
+  optional Statement iter_expr = 4;
+  optional Statement body = 5;
 }
 
 message InitializerList { repeated Expression args = 1; }
@@ -450,4 +463,15 @@ message ReturnStatement {
     Expression expression = 1;
     // TODO: braced-init-list
   }
+}
+
+message SwitchStatement {
+  optional Expression condition = 1;
+  repeated SwitchCase cases = 2;
+  optional Statement default_body = 3;
+}
+
+message SwitchCase {
+  optional Expression const_expression = 1;
+  optional Statement body = 2;
 }
